@@ -14,7 +14,7 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/employees")
 public class EmployeeController {
 
     @Autowired
@@ -24,31 +24,31 @@ public class EmployeeController {
         this.employeeService = employeeService;
     }
 
-    @GetMapping("/employees")
+    @GetMapping
     public List<Employee> getEmployees() {
         List<Employee> employees = employeeService.retrieveEmployees();
         return employees;
     }
 
-    @GetMapping("/employees/{employeeId}")
+    @GetMapping("/{employeeId}")
     public Employee getEmployee(@PathVariable(name="employeeId")Long employeeId) {
         return employeeService.getEmployee(employeeId);
     }
 
-    @PostMapping("/employees")
+    @PostMapping
     public ResponseEntity<Employee> saveEmployee(@Valid @RequestBody EmployeeCreateUpdateDTO dto){
         Employee employee = employeeService.saveEmployee(dto);
         log.info("New employee created with ID: {}", employee.getId());
         return new ResponseEntity<>(employee, HttpStatus.CREATED);
     }
 
-    @DeleteMapping("/employees/{employeeId}")
+    @DeleteMapping("/{employeeId}")
     public void deleteEmployee(@PathVariable(name="employeeId")Long employeeId){
         employeeService.deleteEmployee(employeeId);
         System.out.println("Employee Deleted Successfully");
     }
 
-    @PutMapping("/employees/{employeeId}")
+    @PutMapping("/{employeeId}")
     public void updateEmployee(@RequestBody Employee employee,
                                @PathVariable(name="employeeId")Long employeeId){
         Employee emp = employeeService.getEmployee(employeeId);
