@@ -1,5 +1,6 @@
 package jp.co.axa.apidemo.entities;
 
+import jp.co.axa.apidemo.dto.EmployeeCreateUpdateDTO;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -15,7 +16,6 @@ import java.sql.Timestamp;
 @Data
 @EntityListeners(AuditingEntityListener.class)
 public class Employee {
-
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Long id;
@@ -34,4 +34,14 @@ public class Employee {
 
     @LastModifiedDate
     private Timestamp updatedAt;
+
+    /**
+     * Create a new Employee from an existing DTO class
+     * @param dto is an {@link EmployeeCreateUpdateDTO}
+     */
+    public Employee(EmployeeCreateUpdateDTO dto) {
+        this.name = dto.getName();
+        this.department = dto.getDepartment();
+        this.salary = dto.getSalary();
+    }
 }
