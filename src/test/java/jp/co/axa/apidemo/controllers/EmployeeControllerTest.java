@@ -16,6 +16,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
 import javax.transaction.Transactional;
 
@@ -78,7 +79,7 @@ public class EmployeeControllerTest {
     @Test
     void postEmployee_HappyPath_ShouldReturnEmployee() throws Exception {
         // When
-        EmployeeCreateUpdateDTO emp = new EmployeeCreateUpdateDTO(
+        EmployeeCreateUpdateDTO empDTO = new EmployeeCreateUpdateDTO(
             "Albus Dumbledore",
             900_000,
             "Office of Wizarding Affairs");
@@ -86,10 +87,31 @@ public class EmployeeControllerTest {
         ResultActions resultActions = mockMvc.perform(
             post("/api/v1/employees")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(employeeJsoner.write(emp).getJson()));
+                .content(employeeJsoner.write(empDTO).getJson()));
 
         // Then
         MockHttpServletResponse response = resultActions.andReturn().getResponse();
         then(response.getStatus()).isEqualTo(HttpStatus.CREATED.value());
+    }
+
+    @Test
+    void postEmployee_BlankName_ShouldNotReturnEmployee() throws Exception {
+        // When
+        EmployeeCreateUpdateDTO empDTO = new EmployeeCreateUpdateDTO(
+            "",
+            900_000,
+            "Office of Wizarding Affairs");
+
+        ResultActions resultActions = mockMvc.perform(
+            post("/api/v1/employees")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(employeeJsoner.write(empDTO).getJson()));
+
+        resultActions.andDo(MockMvcResultHandlers.print());
+
+        // Then
+        resultActions
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.errors.name", is("must not be blank")));
     }
 }
