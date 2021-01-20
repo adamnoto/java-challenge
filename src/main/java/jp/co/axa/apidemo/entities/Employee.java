@@ -1,19 +1,19 @@
 package jp.co.axa.apidemo.entities;
 
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.sql.Timestamp;
 
 @Entity
 @Table(name="EMPLOYEE")
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
+@EntityListeners(AuditingEntityListener.class)
 public class Employee {
 
     @Id
@@ -29,4 +29,9 @@ public class Employee {
     @Column(name="DEPARTMENT")
     private String department;
 
+    @CreatedDate
+    private Timestamp createdAt;
+
+    @LastModifiedDate
+    private Timestamp updatedAt;
 }
