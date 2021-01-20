@@ -3,6 +3,7 @@ package jp.co.axa.apidemo.controllers;
 import jp.co.axa.apidemo.dto.EmployeeCreateUpdateDTO;
 import jp.co.axa.apidemo.entities.Employee;
 import jp.co.axa.apidemo.services.EmployeeService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,15 +15,10 @@ import java.util.List;
 
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/v1/employees")
 public class EmployeeController {
-
-    @Autowired
-    private EmployeeService employeeService;
-
-    public void setEmployeeService(EmployeeService employeeService) {
-        this.employeeService = employeeService;
-    }
+    private final EmployeeService employeeService;
 
     @GetMapping
     public List<Employee> getEmployees() {
