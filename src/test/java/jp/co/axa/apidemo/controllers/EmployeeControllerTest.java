@@ -74,4 +74,22 @@ public class EmployeeControllerTest {
             .andExpect(jsonPath("$[*].salary", contains(employee1.getSalary(), employee2.getSalary())))
             .andExpect(jsonPath("$[*].department", contains(employee1.getDepartment(), employee2.getDepartment())));
     }
+
+    @Test
+    void postEmployee_HappyPath_ShouldReturnEmployee() throws Exception {
+        // When
+        EmployeeCreateUpdateDTO emp = new EmployeeCreateUpdateDTO(
+            "Albus Dumbledore",
+            900_000,
+            "Office of Wizarding Affairs");
+
+        ResultActions resultActions = mockMvc.perform(
+            post("/api/v1/employees")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(employeeJsoner.write(emp).getJson()));
+
+        // Then
+        MockHttpServletResponse response = resultActions.andReturn().getResponse();
+        then(response.getStatus()).isEqualTo(HttpStatus.CREATED.value());
+    }
 }
