@@ -95,23 +95,23 @@ public class EmployeeControllerTest {
     }
 
     @Test
-    void postEmployee_BlankName_ShouldNotReturnEmployee() throws Exception {
+    void postEmployee_IncompleteData_ShouldNotReturnEmployee() throws Exception {
         // When
         EmployeeCreateUpdateDTO empDTO = new EmployeeCreateUpdateDTO(
             "",
-            900_000,
-            "Office of Wizarding Affairs");
+            1,
+            "");
 
         ResultActions resultActions = mockMvc.perform(
             post("/api/v1/employees")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(employeeJsoner.write(empDTO).getJson()));
 
-        resultActions.andDo(MockMvcResultHandlers.print());
-
         // Then
         resultActions
             .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.errors.name", is("must not be blank")));
+            .andExpect(jsonPath("$.errors.name", is("must not be blank")))
+            .andExpect(jsonPath("$.errors.department", is("must not be blank")))
+            .andExpect(jsonPath("$.errors.salary", is("must be greater than or equal to 300000")));
     }
 }
