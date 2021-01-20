@@ -1,57 +1,59 @@
 package jp.co.axa.apidemo.controllers;
 
+import jp.co.axa.apidemo.dto.EmployeeCreateUpdateDTO;
 import jp.co.axa.apidemo.entities.Employee;
 import jp.co.axa.apidemo.services.EmployeeService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.json.JacksonTester;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 
-import java.sql.Timestamp;
-import java.util.Arrays;
+import javax.transaction.Transactional;
 
 import static org.hamcrest.Matchers.*;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.assertj.core.api.BDDAssertions.then;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(EmployeeController.class)
+@SpringBootTest
+@AutoConfigureJsonTesters
+@AutoConfigureMockMvc
+@Transactional
 @ActiveProfiles(profiles = "test")
 public class EmployeeControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @Autowired
+    private JacksonTester<EmployeeCreateUpdateDTO> employeeJsoner;
+
+    @Autowired
     private EmployeeService employeeService;
+
     private Employee employee1, employee2;
 
     @BeforeEach
     void setUp() {
-        employee1 = new Employee(
-            1L,
+        employee1 = employeeService.saveEmployee(new EmployeeCreateUpdateDTO(
             "William Smith",
             600_000,
-            "Finance",
-            new Timestamp(System.currentTimeMillis()),
-            new Timestamp(System.currentTimeMillis())
-        );
+            "Finance"
+        ));
 
-        employee2 = new Employee(
-            2L,
+        employee2 = employeeService.saveEmployee(new EmployeeCreateUpdateDTO(
             "Quincy Adams",
             550_000,
-            "Human Resources",
-            new Timestamp(System.currentTimeMillis()),
-            new Timestamp(System.currentTimeMillis())
-        );
-
-        when(employeeService.retrieveEmployees())
-            .thenReturn(Arrays.asList(employee1, employee2));
+            "Human Resources"
+        ));
     }
 
     @Test

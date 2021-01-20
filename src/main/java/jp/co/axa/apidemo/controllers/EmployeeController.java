@@ -1,12 +1,18 @@
 package jp.co.axa.apidemo.controllers;
 
+import jp.co.axa.apidemo.dto.EmployeeCreateUpdateDTO;
 import jp.co.axa.apidemo.entities.Employee;
 import jp.co.axa.apidemo.services.EmployeeService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1")
 public class EmployeeController {
@@ -30,9 +36,10 @@ public class EmployeeController {
     }
 
     @PostMapping("/employees")
-    public void saveEmployee(Employee employee){
-        employeeService.saveEmployee(employee);
-        System.out.println("Employee Saved Successfully");
+    public ResponseEntity<Employee> saveEmployee(@Valid @RequestBody EmployeeCreateUpdateDTO dto){
+        Employee employee = employeeService.saveEmployee(dto);
+        log.info("New employee created with ID: {}", employee.getId());
+        return new ResponseEntity<>(employee, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/employees/{employeeId}")
