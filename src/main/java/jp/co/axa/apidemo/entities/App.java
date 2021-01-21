@@ -11,6 +11,7 @@ import org.springframework.security.crypto.keygen.KeyGenerators;
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -39,9 +40,9 @@ public class App {
     @Column(name="SECRET_PASSWORD")
     private String secretPassword;
 
-    @Column(name="AUTHORITIES")
-    @Convert(converter = StringListConverter.class)
-    private List<String> rights;
+    @Column(name="RIGHTS")
+    @Convert(converter = AppRight.ListConverter.class)
+    private List<AppRight> rights;
 
     @CreatedDate
     private Timestamp createdAt;
@@ -50,7 +51,28 @@ public class App {
     private Timestamp updatedAt;
 
     /**
-     * Creates an instance of an App.
+     * Creates an instance of an {@link App}.
+     *
+     * @param name the name of the App
+     * @param secretUserName the username for authentication
+     * @param secretPassword the password for authentication
+     * @param rights the privileges of the app
+     */
+    public App(final String name, final String secretUserName, final String secretPassword, final List<AppRight> rights) {
+        this(
+            null,
+            name,
+            secretUserName,
+            secretPassword,
+            rights,
+            null,
+            null
+        );
+    }
+
+    /**
+     * Creates an instance of an {@link App}. App created from this constructor
+     * will by default has the right to only read data.
      *
      * @param name the name of the App
      * @param secretUserName the username for authentication
@@ -58,13 +80,10 @@ public class App {
      */
     public App(final String name, final String secretUserName, final String secretPassword) {
         this(
-            null,
             name,
             secretUserName,
             secretPassword,
-            new ArrayList<>(),
-            null,
-            null
+            new ArrayList<>(Arrays.asList(AppRight.READ))
         );
     }
 
@@ -79,15 +98,18 @@ public class App {
         this(
             name,
             UUID.randomUUID().toString().split("-")[0],
-            KeyGenerators.string().generateKey()
+            KeyGenerators.string().generateKey(),
+            new ArrayList<>(Arrays.asList(AppRight.READ))
         );
+
+
     }
 
     /**
      * Add rights that this app instance is allowed to do
      * @param rights the rights
      */
-    public void addRights(List<String> rights) {
+    public void addRights(List<AppRight> rights) {
         this.rights.addAll(rights);
     }
 
@@ -96,7 +118,7 @@ public class App {
      * able to perform the specified rights anymore
      * @param rights the rights
      */
-    public void removeRights(List<String> rights) {
+    public void removeRights(List<AppRight> rights) {
         this.rights.removeAll(rights);
     }
 }

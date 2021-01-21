@@ -10,6 +10,7 @@ import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.json.JacksonTester;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -17,6 +18,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+import org.springframework.util.Base64Utils;
 
 import javax.transaction.Transactional;
 
@@ -42,6 +44,8 @@ public class EmployeeControllerTest {
 
     private Employee employee1, employee2;
 
+    private static String authHeader = "Basic " + Base64Utils.encodeToString("axa:12345".getBytes());
+
     @BeforeEach
     void setUp() {
         employee1 = employeeService.saveEmployee(new EmployeeCreateUpdateDTO(
@@ -58,10 +62,23 @@ public class EmployeeControllerTest {
     }
 
     @Test
+    void getEmployees_IncorrectCredentials_ShouldNotAuthorize() throws Exception {
+        // When
+        ResultActions resultActions = mockMvc.perform(
+            get("/api/v1/employees")
+                .header(HttpHeaders.AUTHORIZATION, "WRONG")
+        );
+
+        // Then
+        resultActions.andExpect(status().isUnauthorized());
+    }
+
+    @Test
     void getEmployees_HappyPath_ShouldReturnEmployees() throws Exception {
         // When
         ResultActions resultActions = mockMvc.perform(
             get("/api/v1/employees")
+                .header(HttpHeaders.AUTHORIZATION, authHeader)
         );
 
         // Then
@@ -86,6 +103,7 @@ public class EmployeeControllerTest {
 
         ResultActions resultActions = mockMvc.perform(
             post("/api/v1/employees")
+                .header(HttpHeaders.AUTHORIZATION, authHeader)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(employeeJsoner.write(empDTO).getJson()));
 
@@ -104,6 +122,7 @@ public class EmployeeControllerTest {
 
         ResultActions resultActions = mockMvc.perform(
             post("/api/v1/employees")
+                .header(HttpHeaders.AUTHORIZATION, authHeader)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(employeeJsoner.write(empDTO).getJson()));
 

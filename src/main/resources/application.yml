@@ -1,4 +1,6 @@
 spring:
+  profiles:
+    active: development
   h2:
     console:
       enabled: true
@@ -6,15 +8,17 @@ spring:
 spring:
   profiles: development
   jpa:
-    show_sql: false
+    show-sql: false
     database: H2
+    hibernate:
+      ddl-auto: update
   datasource:
-    url: jdbc:h2:~/axaempsvcdb
+    url: jdbc:h2:file:~/axaempsvcdb;DB_CLOSE_ON_EXIT=FALSE
 ---
 spring:
   profiles: test
   jpa:
-    show_sql: true
+    show-sql: true
     database: H2
   datasource:
     url: jdbc:h2:mem:axaempsvctestdb;DB_CLOSE_ON_EXIT=FALSE

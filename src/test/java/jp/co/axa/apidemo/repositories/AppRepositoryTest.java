@@ -1,6 +1,7 @@
 package jp.co.axa.apidemo.repositories;
 
 import jp.co.axa.apidemo.entities.App;
+import jp.co.axa.apidemo.entities.AppRight;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,9 +20,10 @@ public class AppRepositoryTest {
     private AppRepository appRepository;
 
     @Test
-    public void save_AuthoritiesHappyPath_ShouldBeRetrievableAsList() {
+    public void save_RightsHappyPath_ShouldBeRetrievableAsList() {
         // When
         App app = new App("coolapp");
+        app.removeRights(AppRight.ALL);
         appRepository.save(app);
 
         // Then
@@ -29,19 +31,22 @@ public class AppRepositoryTest {
         then(app.getRights()).isEmpty();
 
         // When (2) -- add some rights
-        app.addRights(Arrays.asList("READ", "WRITE", "DELETE"));
+        app.addRights(Arrays.asList(AppRight.READ, AppRight.WRITE, AppRight.DELETE));
         appRepository.save(app);
         app = appRepository.findBySecretUserName(app.getSecretUserName()).get();
 
         // Then
-        then(app.getRights()).containsExactlyInAnyOrder("READ", "WRITE", "DELETE");
+        then(app.getRights()).containsExactlyInAnyOrder(
+            AppRight.READ,
+            AppRight.WRITE,
+            AppRight.DELETE);
 
         // When (3) -- remove some rights
-        app.removeRights(Arrays.asList("WRITE"));
+        app.removeRights(Arrays.asList(AppRight.WRITE));
         appRepository.save(app);
         app = appRepository.findBySecretUserName(app.getSecretUserName()).get();
 
         // Then
-        then(app.getRights()).containsExactlyInAnyOrder("READ", "DELETE");
+        then(app.getRights()).containsExactlyInAnyOrder(AppRight.READ, AppRight.DELETE);
     }
 }
