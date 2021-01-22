@@ -9,9 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -28,7 +30,9 @@ public class EmployeeController {
 
     @GetMapping("/{employeeId}")
     public Employee getEmployee(@PathVariable(name="employeeId")Long employeeId) {
-        return employeeService.getEmployee(employeeId);
+        log.info("Retrieve an employee with ID: " + employeeId);
+        return employeeService.getEmployee(employeeId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
     @PostMapping
@@ -40,18 +44,21 @@ public class EmployeeController {
 
     @DeleteMapping("/{employeeId}")
     public void deleteEmployee(@PathVariable(name="employeeId")Long employeeId){
+        log.info("Delete an employee with ID: " + employeeId);
         employeeService.deleteEmployee(employeeId);
         System.out.println("Employee Deleted Successfully");
     }
 
     @PutMapping("/{employeeId}")
-    public void updateEmployee(@RequestBody Employee employee,
+    public Employee updateEmployee(@RequestBody EmployeeCreateUpdateDTO dto,
                                @PathVariable(name="employeeId")Long employeeId){
-        Employee emp = employeeService.getEmployee(employeeId);
-        if(emp != null){
-            employeeService.updateEmployee(employee);
-        }
 
+        Employee emp = employeeService.getEmployee(employeeId)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        log.info("Update an employee with ID: " + employeeId);
+        emp.updateFrom(dto);
+        return employeeService.updateEmployee(emp);
     }
 
 }

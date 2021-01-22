@@ -4,11 +4,16 @@ spring:
   h2:
     console:
       enabled: true
+logging:
+  level:
+    org:
+      springframework:
+        cache: TRACE
 ---
 spring:
   profiles: development
   jpa:
-    show-sql: false
+    show-sql: true
     database: H2
     hibernate:
       ddl-auto: update

@@ -6,6 +6,9 @@ import jp.co.axa.apidemo.repositories.EmployeeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,9 +24,9 @@ public class EmployeeServiceImpl implements EmployeeService{
         return employees;
     }
 
-    public Employee getEmployee(Long employeeId) {
-        Optional<Employee> optEmp = employeeRepository.findById(employeeId);
-        return optEmp.get();
+    @Cacheable(value = "employees", key = "#employeeId")
+    public Optional<Employee> getEmployee(Long employeeId) {
+        return employeeRepository.findById(employeeId);
     }
 
     public Employee saveEmployee(EmployeeCreateUpdateDTO dto){
@@ -32,11 +35,13 @@ public class EmployeeServiceImpl implements EmployeeService{
         return employee;
     }
 
+    @CacheEvict(value = "employees", key = "#employeeId")
     public void deleteEmployee(Long employeeId){
         employeeRepository.deleteById(employeeId);
     }
 
-    public void updateEmployee(Employee employee) {
-        employeeRepository.save(employee);
+    @CachePut(value = "employees", key="#employee.id")
+    public Employee updateEmployee(Employee employee) {
+        return employeeRepository.save(employee);
     }
 }

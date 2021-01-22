@@ -7,6 +7,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 @Entity
@@ -15,7 +16,7 @@ import java.sql.Timestamp;
 @AllArgsConstructor
 @Data
 @EntityListeners(AuditingEntityListener.class)
-public class Employee {
+public class Employee implements Serializable {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Long id;
@@ -43,5 +44,11 @@ public class Employee {
         this.name = dto.getName();
         this.department = dto.getDepartment();
         this.salary = dto.getSalary();
+    }
+
+    public void updateFrom(EmployeeCreateUpdateDTO dto) {
+        setName(dto.getName());
+        setSalary(dto.getSalary());
+        setDepartment(dto.getDepartment());
     }
 }
