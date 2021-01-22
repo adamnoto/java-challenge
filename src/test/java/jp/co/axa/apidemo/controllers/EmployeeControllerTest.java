@@ -206,4 +206,33 @@ public class EmployeeControllerTest {
         // Then
         resultActions.andExpect(status().isNotFound());
     }
+
+    @Test
+    void deleteEmployee_NotFound_ShouldNotFound() throws Exception {
+        // When
+        Employee emp = employeeService.retrieveEmployees().get(0);
+        ResultActions resultActions = mockMvc.perform(
+            get("/api/v1/employees/-1")
+                .header(HttpHeaders.AUTHORIZATION, authHeader)
+        );
+
+        // Then
+        resultActions.andExpect(status().isNotFound());
+    }
+
+    @Test
+    void deleteEmployee_HappyPath_ShouldDeleteEmployee() throws Exception {
+        // When
+        Employee existingEmployee = employeeService.saveEmployee(new EmployeeCreateUpdateDTO(
+            "Tanaka Tara", 500000, "Financ"
+        ));
+        ResultActions resultActions = mockMvc.perform(
+            delete("/api/v1/employees/" + existingEmployee.getId())
+                .header(HttpHeaders.AUTHORIZATION, authHeader)
+        );
+
+        // Then
+        resultActions.andExpect(status().isNoContent());
+        then(employeeService.getEmployee(existingEmployee.getId())).isEmpty();
+    }
 }
