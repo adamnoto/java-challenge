@@ -22,33 +22,24 @@ What I did:
 
 - List the employees:
 
-  ```bash
-  $ curl -u axa:12345 http://localhost:8080/api/v1/employees
-  ```
-
+  > curl -u axa:12345 http://localhost:8080/api/v1/employees
+  
 - Add a new employee:
 
-  ```bash
-  $ curl -s -u axa:12345 -H "Content-Type: application/json" -XPOST http://localhost:8080/api/v1/employees --data '{"name": "Adam Pahlevi Baihaqi", "salary": "666666", "department": "Software Engineering"}'
-  ```
-
+  > curl -s -u axa:12345 -H "Content-Type: application/json" -XPOST http://localhost:8080/api/v1/employees --data '{"name": "Adam Pahlevi Baihaqi", "salary": "666666", "department": "Software Engineering"}'
+  
 - Get an employee, assume the employee's ID is 1:
 
-  ```bash
-  $ curl -u axa:12345 http://localhost:8080/api/v1/employees/1
-  ```
-
+  > curl -u axa:12345 http://localhost:8080/api/v1/employees/1
+  
 - Update an employee, assume the ID is 1:
 
-  ```bash
-  $ curl -s -u axa:12345 -H "Content-Type: application/json" -XPUT http://localhost:8080/api/v1/employees/1 --data '{"name": "Adam Pahlevi Baihaqi", "salary": "999999", "department": "Software Engineering"}'
-  ```
+  > curl -s -u axa:12345 -H "Content-Type: application/json" -XPUT http://localhost:8080/api/v1/employees/1 --data '{"name": "Adam Pahlevi Baihaqi", "salary": "999999", "department": "Software Engineering"}'
   
 - Delete an employee, assume the ID is 1:
 
-  ```bash
-  $ curl -u axa:12345 -XDELETE http://localhost:8080/api/v1/employees/1
-  ```
+  > curl -u axa:12345 -XDELETE http://localhost:8080/api/v1/employees/1
+  
 
 #### Your experience in Java
 
