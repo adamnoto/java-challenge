@@ -84,13 +84,38 @@ public class EmployeeControllerTest {
         // Then
         resultActions
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$", hasSize(2)))
+            .andExpect(jsonPath("$", hasSize(3)))
             .andExpect(jsonPath("$[*].createdAt", is(notNullValue())))
             .andExpect(jsonPath("$[*].updatedAt", is(notNullValue())))
-            .andExpect(jsonPath("$[*].id", contains(employee1.getId().intValue(), employee2.getId().intValue())))
-            .andExpect(jsonPath("$[*].name", contains(employee1.getName(), employee2.getName())))
-            .andExpect(jsonPath("$[*].salary", contains(employee1.getSalary(), employee2.getSalary())))
-            .andExpect(jsonPath("$[*].department", contains(employee1.getDepartment(), employee2.getDepartment())));
+            .andExpect(jsonPath("$[*].id", hasItems(employee1.getId().intValue(), employee2.getId().intValue())))
+            .andExpect(jsonPath("$[*].name", hasItems(employee1.getName(), employee2.getName())))
+            .andExpect(jsonPath("$[*].salary", hasItems(employee1.getSalary(), employee2.getSalary())))
+            .andExpect(jsonPath("$[*].department", hasItems(employee1.getDepartment(), employee2.getDepartment())));
+    }
+
+    @Test
+    void getEmployee_HappyPath_ShouldReturnEmployee() throws Exception {
+        // When
+        Employee emp = employeeService.retrieveEmployees().get(0);
+        ResultActions resultActions = mockMvc.perform(
+            get("/api/v1/employees/" + emp.getId())
+                .header(HttpHeaders.AUTHORIZATION, authHeader)
+        );
+
+        // Then
+        resultActions.andExpect(status().isOk());
+    }
+
+    @Test
+    void getEmployee_NotFound_ShouldNotFound() throws Exception {
+        // When
+        ResultActions resultActions = mockMvc.perform(
+            get("/api/v1/employees/-1")
+                .header(HttpHeaders.AUTHORIZATION, authHeader)
+        );
+
+        // Then
+        resultActions.andExpect(status().isNotFound());
     }
 
     @Test
@@ -132,5 +157,53 @@ public class EmployeeControllerTest {
             .andExpect(jsonPath("$.errors.name", is("must not be blank")))
             .andExpect(jsonPath("$.errors.department", is("must not be blank")))
             .andExpect(jsonPath("$.errors.salary", is("must be greater than or equal to 300000")));
+    }
+
+    @Test
+    void putEmployee_HappyPath_ShouldBeUpdated() throws Exception {
+        String newName = "Tanaka Taro";
+        int newSalary = 699000;
+        String newDepartment = "Finance";
+
+        // When 1 - Updating the employee
+        Employee existingEmployee = employeeService.saveEmployee(new EmployeeCreateUpdateDTO(
+            "Tanaka Tara", 500000, "Financ"
+        ));
+        EmployeeCreateUpdateDTO updateDTO = new EmployeeCreateUpdateDTO(newName, newSalary, newDepartment);
+        ResultActions resultActions = mockMvc.perform(
+            put("/api/v1/employees/" + existingEmployee.getId())
+                .header(HttpHeaders.AUTHORIZATION, authHeader)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(employeeJsoner.write(updateDTO).getJson()));
+
+        // Then
+        resultActions.andExpect(status().isOk())
+            .andExpect(jsonPath("$.name", is(newName)));
+
+        // When 2 - Query the employee
+        resultActions = mockMvc.perform(
+            get("/api/v1/employees/" + existingEmployee.getId())
+                .header(HttpHeaders.AUTHORIZATION, authHeader)
+        );
+
+        // Then
+        resultActions.andExpect(status().isOk())
+            .andExpect(jsonPath("$.name", is(newName)))
+            .andExpect(jsonPath("$.salary", is(newSalary)))
+            .andExpect(jsonPath("$.department", is(newDepartment)));
+    }
+
+    @Test
+    void putEmployee_NotFound_ShouldNotCreateOrUpdate() throws Exception {
+        // When
+        EmployeeCreateUpdateDTO updateDTO = new EmployeeCreateUpdateDTO("ABC", 0, "DEF");
+        ResultActions resultActions = mockMvc.perform(
+            put("/api/v1/employees/-1")
+                .header(HttpHeaders.AUTHORIZATION, authHeader)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(employeeJsoner.write(updateDTO).getJson()));
+
+        // Then
+        resultActions.andExpect(status().isNotFound());
     }
 }
