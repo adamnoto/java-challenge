@@ -18,6 +18,8 @@ What I did:
 - Introduce profiles to separate between test and development. Development database are persisted, rather than in-memory. Both are using H2 as the DBMS.
 - Some refactoring (eg: using of Optional, making the request path easier to read, etc.)
 
+If I have more time: I will authenticate each methods in the controller with the actual rights/privileges given to the App. It can be done, but... there're always features to add :)
+
 ## Possible things to do with the App:
 
 - List the employees:
