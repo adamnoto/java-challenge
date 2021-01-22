@@ -1,52 +1,55 @@
-### How to use this spring-boot project
+# Employee Service
 
-- Install packages with `mvn package`
-- Run `mvn spring-boot:run` for starting the application (or use your IDE)
+To run:
 
-Application (with the embedded H2 database) is ready to be used ! You can access the url below for testing it :
+```bash
+$ mvn spring-boot:run
+```
 
-- Swagger UI : http://localhost:8080/swagger-ui.html
-- H2 UI : http://localhost:8080/h2-console
+What I did:
 
-> Don't forget to set the `JDBC URL` value as `jdbc:h2:mem:testdb` for H2 UI.
+- Add validations to Employee (through DTO/Data Transfer Object)
+- Add security layer via Authorization header. Extensible by use of `App` entity to represent "who can do what"
+- Implement caching with Spring Cache and Hazelcast
+- Added ControllerAdvisor to centralize exception handling for reporting validation errors
+- Use logger (instead of System.out.println)
+- Refactor the dependency injection by using Lombok
+- Added tests (controller & a repository test)
+- Introduce profiles to separate between test and development. Development database are persisted, rather than in-memory. Both are using H2 as the DBMS.
+- Some refactoring (eg: using of Optional, making the request path easier to read, etc.)
 
+## Possible things to do with the App:
 
+- List the employees:
 
-### Instructions
+  ```bash
+  $ curl -u axa:12345 http://localhost:8080/api/v1/employees
+  ```
 
-- download the zip file of this project
-- create a repository in your own github named 'java-challenge'
-- clone your repository in a folder on your machine
-- extract the zip file in this folder
-- commit and push
+- Add a new employee:
 
-- Enhance the code in any ways you can see, you are free! Some possibilities:
-  - Add tests
-  - Change syntax
-  - Protect controller end points
-  - Add caching logic for database calls
-  - Improve doc and comments
-  - Fix any bug you might find
-- Edit readme.md and add any comments. It can be about what you did, what you would have done if you had more time, etc.
-- Send us the link of your repository.
+  ```bash
+  $ curl -s -u axa:12345 -H "Content-Type: application/json" -XPOST http://localhost:8080/api/v1/employees --data '{"name": "Adam Pahlevi Baihaqi", "salary": "666666", "department": "Software Engineering"}'
+  ```
 
-#### Restrictions
-- use java 8
+- Get an employee, assume the employee's ID is 1:
 
+  ```bash
+  $ curl -u axa:12345 http://localhost:8080/api/v1/employees/1
+  ```
 
-#### What we will look for
-- Readability of your code
-- Documentation
-- Comments in your code 
-- Appropriate usage of spring boot
-- Appropriate usage of packages
-- Is the application running as expected
-- No performance issues
+- Update an employee, assume the ID is 1:
+
+  ```bash
+  $ curl -s -u axa:12345 -H "Content-Type: application/json" -XPUT http://localhost:8080/api/v1/employees/1 --data '{"name": "Adam Pahlevi Baihaqi", "salary": "999999", "department": "Software Engineering"}'
+  ```
+  
+- Delete an employee, assume the ID is 1:
+
+  ```bash
+  $ curl -u axa:12345 -XDELETE http://localhost:8080/api/v1/employees/1
+  ```
 
 #### Your experience in Java
 
-Please let us know more about your Java experience in a few sentences. For example:
-
-- I have 3 years experience in Java and I started to use Spring Boot from last year
-- I'm a beginner and just recently learned Spring Boot
-- I know Spring Boot very well and have been using it for many years
+I have used Spring Boot in the past, and in my side projects. Currently, I work as Ruby on Rails engineers (and have written a book about it published by Apress). However, about Java and Spring Boot, I think I am quite confident with the tools too.
